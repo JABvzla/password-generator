@@ -1,0 +1,108 @@
+<main id='JABvzla'>
+	<form class='form'>
+		<input id='password' type='text' readonly />
+		<label>
+			Length <input id='long' type='number' value='8' />
+		</label>
+		<label>
+			Symbols <input id='symbols' type='checkbox' checked />
+		</label>
+		<label>
+			Numbers
+			<input id='numbers' type='checkbox' checked />
+		</label>
+		<label>
+			Letters uppercase
+			<input id='uppercase' type='checkbox' checked />
+		</label>
+		<label>
+			Letters lowercase
+			<input id='lowercase' type='checkbox' checked />
+		</label>
+		<input id='submit' type='button' value='Generate' />
+	</form>
+</main>
+
+<style>
+	#JABvzla {
+		--primary-color: #161122;
+		--secondary-color: #ccc;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100vw;
+		height: 100vh;
+		background: linear-gradient(90deg, var(--secondary-color) 21px, transparent 1%) center,
+			linear-gradient(var(--secondary-color) 21px, transparent 1%) center, var(--primary-color);
+		background-size: 22px 22px;
+		overflow: hidden;
+	}
+	#JABvzla > .form {
+		display: flex;
+		flex-direction: column;
+		background: #fff;
+		padding: 12px;
+	}
+	#JABvzla > .form > label {
+		display: flex;
+		justify-content: space-between;
+		padding: 2px;
+	}
+	#JABvzla > .form input {
+		border-bottom: 1px solid #161122;
+	}
+	#JABvzla > .form input#submit {
+		border: 1px solid #161122;
+	}
+	#JABvzla > .form input#long {
+		width: 3em;
+		text-align: center;
+	}
+</style>
+
+<script type='text/javascript'>
+	const SYMBOLS_AVAILABLES = '!$%&/()=?¿+"'
+	const NUMBERS_AVAILABLES = '1234567890'
+	const UPPERCASE_AVAILABLES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+	const LOWERCASE_AVAILABLES = UPPERCASE_AVAILABLES.toLowerCase()
+
+	const { symbols, numbers, uppercase, lowercase, long, password, submit } = window
+	const getRandom = (chrs) => chrs.split('')[Math.floor(Math.random() * chrs.length)]
+	const suffle = (array) => array.sort(() => 0.5 - Math.random())
+	const repeat = (n) => (cb) => {
+		if (n === 0) return
+		cb()
+		return repeat(n - 1)(cb)
+	}
+	const getAvailablesCharacters = () =>
+		[
+			symbols.checked && SYMBOLS_AVAILABLES,
+			numbers.checked && NUMBERS_AVAILABLES,
+			uppercase.checked && UPPERCASE_AVAILABLES,
+			lowercase.checked && LOWERCASE_AVAILABLES
+		].filter(Boolean)
+
+	function generatePassword() {
+		password.value = ''
+		const availablesCharacter = getAvailablesCharacters()
+		const repeatCount =
+			long.value > availablesCharacter.length
+				? Math.ceil(long.value / availablesCharacter.length)
+				: 1
+		const randomCharacters = []
+		repeat(repeatCount)(() => {
+			randomCharacters.push(suffle(availablesCharacter.map(getRandom)))
+		})
+		const newPassword = randomCharacters.flat().join('').substring(0, long.value)
+		password.value = newPassword
+		navigator.clipboard.writeText(newPassword)
+	}
+
+	submit.onclick = generatePassword
+	long.onchange = generatePassword
+	symbols.onchange = generatePassword
+	numbers.onchange = generatePassword
+	uppercase.onchange = generatePassword
+	lowercase.onchange = generatePassword
+	generatePassword()
+</script>
